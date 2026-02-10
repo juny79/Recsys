@@ -1,0 +1,25 @@
+# Ignore all data and output folders completely
+data/
+output/
+
+# Extra safety for any loose large files
+*.csv
+*.parquet
+*.pth
+*.png
+*.inter
+temp_v5_scores.csv
+
+# Python / Environment
+__pycache__/
+*.pyc
+.venv/
+.env
+.ipynb_checkpoints/
+
+# Models & Logs
+code/saved/
+code/catboost_info/
+code/log_tensorboard/
+code/inference_log.txt
+catboost_info/
