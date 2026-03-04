@@ -1,0 +1,51 @@
+# LightGCN 설정
+# ========================
+# 기존 SASRec_dataset을 그대로 재사용
+# RecBole의 General CF 모델로 학습
+# 
+# LightGCN이 ALS와 다른 이유:
+#   ALS:      유저/아이템 벡터를 따로 학습 (Matrix Factorization)
+#   LightGCN: 유저-아이템 이분 그래프에서 메시지 전파 (Graph Propagation)
+#             → 2-hop, 3-hop 이웃까지 자동 반영
+#             → "내 취향과 유사한 유저들이 산 것"을 더 잘 캡처
+# ========================
+
+data_path: '../data'
+data_save_path: './data'
+USER_ID_FIELD: user_idx
+ITEM_ID_FIELD: item_idx
+TIME_FIELD: event_time
+
+# 최소 상호작용 기준 (SASRec과 동일하게)
+user_inter_num_interval: "[5,Inf)"
+item_inter_num_interval: "[5,Inf)"
+
+load_col:
+  inter: ['user_idx', 'item_idx', 'event_time']
+
+# ===== LightGCN 핵심 파라미터 =====
+embedding_size: 128         # ALS와 동일한 잠재 차원 (비교 용이)
+n_layers: 3                 # 그래프 전파 레이어 수 (3 = 3-hop 이웃까지)
+reg_weight: 1e-4            # L2 정규화
+require_pow: False          # 정규화 방식
+
+# ===== 학습 파라미터 =====
+train_batch_size: 4096
+learning_rate: 5e-4
+epochs: 30
+stopping_step: 5
+eval_batch_size: 4096
+
+# ===== 평가 =====
+eval_args:
+  split:
+    LS:
+      valid_and_test
+  group_by: user
+  order: TO
+  mode: full
+
+metrics: ['Recall', 'NDCG']
+topk: 10
+valid_metric: NDCG@10
+checkpoint_dir: './saved'
